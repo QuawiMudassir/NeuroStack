@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { Link } from "react-router-dom";
+
 import {
   Dialog,
   DialogPanel,
@@ -23,8 +25,8 @@ import { ChevronDownIcon, PhoneIcon, PlayCircleIcon } from '@heroicons/react/20/
 import logo from '../../assets/logo.png'
 
 const products = [
-  { name: 'Neural Net X', description: 'NeuroTech for real-time brain computing', href: '#', icon: CubeTransparentIcon },
-  { name: 'Assistance PAL', description: 'Our AI Powered healthcare professional', href: '#', icon: SparklesIcon },
+  { name: 'Neural Net X', description: 'NeuroTech for real-time brain computing', href: '/NeuralNetX', icon: CubeTransparentIcon },
+  { name: 'Assistance PAL', description: 'Our AI Powered healthcare professional', href: '/AssistancePal', icon: SparklesIcon },
   { name: 'Security', description: 'Your customer’s data will be safe and secure', href: '#', icon: FingerPrintIcon },
   { name: 'Integrations', description: 'Connect with third-party tools', href: '#', icon: SquaresPlusIcon },
   { name: 'Automations', description: 'Build strategic funnels that will convert', href: '#', icon: ArrowPathIcon },
@@ -42,14 +44,14 @@ export default function Navbar() {
     <header className="sticky top-0 z-50 bg-white">
       <nav aria-label="Global" className="mx-auto flex max-w-7xl items-center justify-between p-6 lg:px-8">
         <div className="flex lg:flex-1">
-          <a href="#" className="-m-1.5 p-1.5">
+          <Link to="/" className="-m-1.5 p-1.5">
             <span className="sr-only">Your Company</span>
             <img
               alt=""
               src={logo}
-              className="h-8 w-auto"
+              className="h-14 w-auto"
             />
-          </a>
+          </Link>
         </div>
         <div className="flex lg:hidden">
           <button
@@ -62,6 +64,9 @@ export default function Navbar() {
           </button>
         </div>
         <PopoverGroup className="hidden lg:flex lg:gap-x-12">
+        <Link to="/" className="text-sm/6 font-semibold text-grey-900">
+            Home
+          </Link>
           <Popover className="relative">
             <PopoverButton className="flex items-center gap-x-1 text-sm/6 font-semibold text-grey-900">
               Products
@@ -106,31 +111,31 @@ export default function Navbar() {
             </PopoverPanel>
           </Popover>
 
-          <a href="#" className="text-sm/6 font-semibold text-grey-900">
+          <Link to="/features" className="text-sm/6 font-semibold text-grey-900">
             Features
-          </a>
-          <a href="#" className="text-sm/6 font-semibold text-grey-900">
+          </Link>
+          <Link to="/company" className="text-sm/6 font-semibold text-grey-900">
             Company
-          </a>
+          </Link>
         </PopoverGroup>
         <div className="hidden lg:flex lg:flex-1 lg:justify-end">
-          <a href="#" className="text-sm/6 font-semibold text-grey-900">
+          <Link to="/login" className="text-sm/6 font-semibold text-grey-900">
             Log in <span aria-hidden="true">&rarr;</span>
-          </a>
+          </Link>
         </div>
       </nav>
       <Dialog open={mobileMenuOpen} onClose={setMobileMenuOpen} className="lg:hidden">
         <div className="fixed inset-0 z-10" />
         <DialogPanel className="fixed inset-y-0 right-0 z-10 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-[#008170]/10">
           <div className="flex items-center justify-between">
-            <a href="#" className="-m-1.5 p-1.5">
+            <Link to="/" className="-m-1.5 p-1.5">
               <span className="sr-only">Your Company</span>
               <img
                 alt=""
                 src={logo}
                 className="h-8 w-auto"
               />
-            </a>
+            </Link>
             <button
               type="button"
               onClick={() => setMobileMenuOpen(false)}
@@ -144,6 +149,12 @@ export default function Navbar() {
             <div className="-my-6 divide-y divide-gray-500/10">
               <div className="space-y-2 py-6">
                 <Disclosure as="div" className="-mx-3">
+                  <Link 
+                    to="/" 
+                    className="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-[#008170] hover:bg-gray-50"
+                  >
+                    Home
+                  </Link>
                   <DisclosureButton className="group flex w-full items-center justify-between rounded-lg py-2 pr-3.5 pl-3 text-base/7 font-semibold text-[#008170] hover:bg-gray-50">
                     Product
                     <ChevronDownIcon aria-hidden="true" className="size-5 flex-none group-data-open:rotate-180" />
@@ -161,32 +172,27 @@ export default function Navbar() {
                     ))}
                   </DisclosurePanel>
                 </Disclosure>
-                <a
-                  href="#"
+                <Link
+                  to="/features"
                   className="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-[#008170] hover:bg-gray-50"
                 >
                   Features
-                </a>
-                <a
-                  href="#"
-                  className="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-[#008170] hover:bg-gray-50"
-                >
-                  Marketplace
-                </a>
-                <a
-                  href="#"
+                </Link>
+                
+                <Link
+                  to="/company"
                   className="-mx-3 block rounded-lg px-3 py-2 text-base/7 font-semibold text-[#008170] hover:bg-gray-50"
                 >
                   Company
-                </a>
+                </Link>
               </div>
               <div className="py-6">
-                <a
-                  href="#"
+                <Link
+                  to="/login"
                   className="-mx-3 block rounded-lg px-3 py-2.5 text-base/7 font-semibold text-[#008170] hover:bg-gray-50"
                 >
                   Log in
-                </a>
+                </Link>
               </div>
             </div>
           </div>

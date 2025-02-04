@@ -4,7 +4,7 @@ import newwave from '../../assets/newwave.png'
 const Features = () => {
   return (
     <section
-      className="w-full flex items-center bg-cover bg-center bg-no-repeat"
+      className="w-full h-200 flex items-center bg-cover bg-center bg-no-repeat"
       style={{ backgroundImage: `url(${newwave})` }}
       id="projects"
     >
