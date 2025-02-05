@@ -2,21 +2,114 @@ const express = require("express");
 const mongoose = require("mongoose");
 const router = express.Router();
 const Patient = require("../models/patient");
-const path = require("path");
-
 
 /**
  * @swagger
  * tags:
  *   name: Patient
- *   description: API for managing patient
+ *   description: API for managing patients
  */
 
-// GET all patient
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Patient:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: string
+ *           description: The patient ID
+ *         first_name:
+ *           type: string
+ *           description: The patient's first name
+ *         last_name:
+ *           type: string
+ *           description: The patient's last name
+ *         dob:
+ *           type: string
+ *           format: date
+ *           description: The patient's date of birth
+ *         gender:
+ *           type: string
+ *           description: The patient's gender
+ *         email:
+ *           type: string
+ *           format: email
+ *           description: The patient's email address
+ *         contact:
+ *           type: string
+ *           description: The patient's contact phone number
+ *         emergency_contact:
+ *           type: string
+ *           description: The patient's emergency contact number
+ *         address:
+ *           type: string
+ *           description: The patient's address
+ *         doctor_id:
+ *           type: string
+ *           description: The doctor's ID associated with the patient
+ *         created_At:
+ *           type: string
+ *           format: date
+ *           description: The date when the patient record was created
+ *     PatientInput:
+ *       type: object
+ *       properties:
+ *         first_name:
+ *           type: string
+ *         last_name:
+ *           type: string
+ *         dob:
+ *           type: string
+ *           format: date
+ *         gender:
+ *           type: string
+ *         email:
+ *           type: string
+ *           format: email
+ *         contact:
+ *           type: string
+ *         emergency_contact:
+ *           type: string
+ *         address:
+ *           type: string
+ *         doctor_id:
+ *           type: string
+ *       required:
+ *         - first_name
+ *         - last_name
+ *         - dob
+ *         - email
+ *         - contact
+ *         - emergency_contact
+ *         - doctor_id
+ */
+
+/**
+ * @swagger
+ * /api/patients:
+ *   get:
+ *     summary: Get all patients
+ *     description: Fetches a list of all patients.
+ *     tags: [Patient]
+ *     responses:
+ *       200:
+ *         description: A list of patients
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Patient'
+ *       500:
+ *         description: Internal Server Error
+ */
 router.get("/", async (req, res) => {
   try {
-    console.log("Patient");
     const patient = await Patient.find().populate("doctor_id");
+    console.log("Patient");
+
     res.json(patient);
   } catch (err) {
     console.error("Error fetching patient:", err.message);
@@ -24,7 +117,32 @@ router.get("/", async (req, res) => {
   }
 });
 
-// POST: Create a new patient
+/**
+ * @swagger
+ * /api/patients:
+ *   post:
+ *     summary: Create a new patient
+ *     description: Adds a new patient to the database.
+ *     tags: [Patient]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/PatientInput'
+ *     responses:
+ *       201:
+ *         description: Patient created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Patient'
+ *       400:
+ *         description: Bad request (missing fields or invalid data)
+ *       500:
+ *         description: Internal Server Error
+ */
+
 router.post("/", async (req, res) => {
   try {
     const {
@@ -106,7 +224,96 @@ router.post("/", async (req, res) => {
   }
 });
 
-// PUT: Update a patient (no mandatory fields)
+/**
+ * @swagger
+ * /api/patients/{id}:
+ *   get:
+ *     summary: Get a patient by ID
+ *     description: Fetch a patient record by their unique ID
+ *     tags: [Patient]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The unique identifier of the patient
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Patient data retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Patient'
+ *       400:
+ *         description: Invalid patient ID format
+ *       404:
+ *         description: Patient not found
+ *       500:
+ *         description: Internal server error
+ */
+router.get("/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Check if the provided ID is valid
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ error: "Invalid patient ID." });
+    }
+
+    // Find the patient by ID and populate the associated doctor details
+    const patient = await Patient.findById(id).populate(
+      "doctor_id",
+      "name description"
+    );
+
+    if (!patient) {
+      return res.status(404).json({ error: "Patient not found." });
+    }
+
+    res.status(200).json(patient);
+  } catch (err) {
+    console.error("Error fetching patient:", err.message);
+    res
+      .status(500)
+      .json({ error: "Failed to fetch patient", details: err.message });
+  }
+});
+
+/**
+ * @swagger
+ * /api/patients/{id}:
+ *   put:
+ *     summary: Update an existing patient
+ *     description: Updates patient details by ID.
+ *     tags: [Patient]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The patient ID to update
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/PatientInput'
+ *     responses:
+ *       200:
+ *         description: Patient updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Patient'
+ *       400:
+ *         description: Bad request (invalid ID or invalid data)
+ *       404:
+ *         description: Patient not found
+ *       500:
+ *         description: Internal Server Error
+ */
+
 router.put("/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -156,88 +363,61 @@ router.put("/:id", async (req, res) => {
       if (!emailRegex.test(updatedData.email)) {
         return res.status(400).json({ error: "Invalid email format." });
       }
-
-      // Check if the email is already used by another patient
-      const existingEmailPatient = await Patient.findOne({
-        email: updatedData.email,
-      });
-      if (existingEmailPatient && existingEmailPatient._id.toString() !== id) {
-        return res
-          .status(400)
-          .json({ error: "A patient with this email already exists." });
-      }
     }
 
-    // Update the patient record with provided fields
-    const updatedPatient = await Patient.findByIdAndUpdate(id, updatedData, {
-      new: true,
-    });
+    // Update the patient record
+    await Patient.findByIdAndUpdate(id, updatedData, { new: true });
 
-    res
-      .status(200)
-      .json({ message: "Patient updated successfully", updatedPatient });
+    res.status(200).json({ message: "Patient updated successfully." });
   } catch (err) {
     console.error("Error updating patient:", err.message);
-    res
-      .status(500)
-      .json({ error: "Failed to update patient", details: err.message });
+    res.status(500).json({ error: "Failed to update patient" });
   }
 });
 
-// GET: Fetch a patient by ID
-router.get("/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    // Check if the ID is valid
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ error: "Invalid patient ID." });
-    }
-
-    // Find the patient and populate the associated doctor details
-    const patient = await Patient.findById(id).populate(
-      "doctor_id",
-      "name description"
-    );
-
-    if (!patient) {
-      return res.status(404).json({ error: "Patient not found." });
-    }
-
-    res.status(200).json(patient);
-  } catch (err) {
-    console.error("Error fetching patient:", err.message);
-    res
-      .status(500)
-      .json({ error: "Failed to fetch patient", details: err.message });
-  }
-});
-
-// DELETE: Remove a patient by ID
+/**
+ * @swagger
+ * /api/patients/{id}:
+ *   delete:
+ *     summary: Delete a patient by ID
+ *     description: Removes a patient from the database by their ID.
+ *     tags: [Patient]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The patient ID to delete
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Patient deleted successfully
+ *       400:
+ *         description: Invalid ID format
+ *       404:
+ *         description: Patient not found
+ *       500:
+ *         description: Internal Server Error
+ */
 router.delete("/:id", async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Check if the ID is valid
+    // Check if the provided ID is a valid MongoDB ObjectId
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ error: "Invalid patient ID." });
     }
 
     // Find and delete the patient
-    const deletedPatient = await Patient.findByIdAndDelete(id);
-
-    if (!deletedPatient) {
+    const result = await Patient.findByIdAndDelete(id);
+    if (!result) {
       return res.status(404).json({ error: "Patient not found." });
     }
 
-    res
-      .status(200)
-      .json({ message: "Patient deleted successfully", deletedPatient });
+    res.status(200).json({ message: "Patient deleted successfully." });
   } catch (err) {
     console.error("Error deleting patient:", err.message);
-    res
-      .status(500)
-      .json({ error: "Failed to delete patient", details: err.message });
+    res.status(500).json({ error: "Failed to delete patient" });
   }
 });
 
