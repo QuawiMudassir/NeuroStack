@@ -32,6 +32,11 @@ const PatientSchema = new mongoose.Schema({
     ref: "Doctor",
     required: true,
   },
+  disorder_id: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Disorder",
+    required: true,
+  },
   created_At: { type: Date, required: true, trim: true },
 });
 

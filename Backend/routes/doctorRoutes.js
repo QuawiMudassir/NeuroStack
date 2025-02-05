@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const Doctor = require("../models/doctor");
+const Patient = require("../models/patient");
 
 const router = express.Router();
 
@@ -314,8 +315,15 @@ router.post("/login", async (req, res) => {
       "your_jwt_secret",
       { expiresIn: "1h" }
     );
+    const patients = await Patient.find({
+      doctor_id: doctor.doctor_id,
+    }).populate("doctor_id");
 
-    return res.json({ token, message: "Login successful", doctor } );
+    return res.json({
+      token,
+      message: "Login successful",
+      doctor: { doctor: {...doctor._doc, patients }},
+    });
   } catch (error) {
     return res.status(500).json({ message: "Server error" });
   }
@@ -359,18 +367,21 @@ router.get("/:doctor_id/patients", async (req, res) => {
     if (!mongoose.Types.ObjectId.isValid(doctor_id)) {
       return res.status(400).json({ error: "Invalid doctor ID." });
     }
-
     // Find all patients associated with the provided doctor_id
-    const patients = await Patient.find({ doctor_id }).populate("doctor_id", "name description");
+    const patients = await Patient.find({ doctor_id });
 
     if (!patients || patients.length === 0) {
-      return res.status(404).json({ error: "No patients found for this doctor." });
+      return res
+        .status(404)
+        .json({ error: "No patients found for this doctor." });
     }
 
     res.status(200).json(patients);
   } catch (err) {
     console.error("Error fetching patients by doctor ID:", err.message);
-    res.status(500).json({ error: "Failed to fetch patients", details: err.message });
+    res
+      .status(500)
+      .json({ error: "Failed to fetch patients", details: err.message });
   }
 });
 

@@ -5,6 +5,7 @@ const connectDB = require("./config/db");
 
 const patientRoutes = require("./routes/patientRoutes");
 const doctorRoutes = require("./routes/doctorRoutes");
+const disorderRoutes = require('./routes/disorderRoutes');
 const { swaggerSpec, swaggerUI } = require("./config/swaggerConfig"); // Import Swagger Config
 
 const app = express();
@@ -20,6 +21,7 @@ app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerSpec));
 // API Routes
 app.use("/api/patients", patientRoutes);
 app.use("/api/doctors", doctorRoutes);
+app.use('/api/disorders', disorderRoutes);
 
 const PORT = 3000;
 app.listen(PORT, () => {
