@@ -9,6 +9,7 @@ const PatientSchema = new mongoose.Schema({
     enum: ["male", "female", "other"],
     default: "male",
   },
+
   email: { type: String, required: true, unique: true },
   contact: {
     type: Number,
@@ -32,11 +33,21 @@ const PatientSchema = new mongoose.Schema({
     ref: "Doctor",
     required: true,
   },
-  disorder_id: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Disorder",
+  disorder_id: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Disorder",
+      required: true,
+    },
+  ],
+
+  status: {
+    type: String,
+    enum: ["active", "completed", "discontinued"],
+    default: "active",
     required: true,
   },
+
   created_At: { type: Date, required: true, trim: true },
 });
 

@@ -32,6 +32,7 @@ const Patient = require("../models/patient");
  *           description: The patient's date of birth
  *         gender:
  *           type: string
+ *           enum: [male, female, other]
  *           description: The patient's gender
  *         email:
  *           type: string
@@ -39,16 +40,25 @@ const Patient = require("../models/patient");
  *           description: The patient's email address
  *         contact:
  *           type: string
- *           description: The patient's contact phone number
+ *           description: The patient's contact phone number (Canadian format)
  *         emergency_contact:
  *           type: string
- *           description: The patient's emergency contact number
+ *           description: The patient's emergency contact number (Canadian format)
  *         address:
  *           type: string
  *           description: The patient's address
  *         doctor_id:
  *           type: string
- *           description: The doctor's ID associated with the patient
+ *           description: The ID of the doctor associated with the patient
+ *         disorder_id:
+ *           type: array
+ *           items:
+ *             type: string
+ *           description: List of disorder IDs associated with the patient
+ *         status:
+ *           type: string
+ *           enum: [active, completed, discontinued]
+ *           description: The status of the patient's treatment
  *         created_At:
  *           type: string
  *           format: date
@@ -65,6 +75,7 @@ const Patient = require("../models/patient");
  *           format: date
  *         gender:
  *           type: string
+ *           enum: [male, female, other]
  *         email:
  *           type: string
  *           format: email
@@ -76,6 +87,13 @@ const Patient = require("../models/patient");
  *           type: string
  *         doctor_id:
  *           type: string
+ *         disorder_id:
+ *           type: array
+ *           items:
+ *             type: string
+ *         status:
+ *           type: string
+ *           enum: [active, completed, discontinued]
  *       required:
  *         - first_name
  *         - last_name
@@ -84,7 +102,10 @@ const Patient = require("../models/patient");
  *         - contact
  *         - emergency_contact
  *         - doctor_id
+ *         - disorder_id
+ *         - status
  */
+
 
 /**
  * @swagger
@@ -154,6 +175,8 @@ router.post("/", async (req, res) => {
       contact,
       emergency_contact,
       address,
+      status,
+      disorder_id,
       doctor_id,
     } = req.body;
 
@@ -165,7 +188,9 @@ router.post("/", async (req, res) => {
       !email ||
       !contact ||
       !emergency_contact ||
-      !doctor_id
+      !doctor_id||
+      !status||
+      !disorder_id
     ) {
       return res.status(400).json({ error: "Missing required fields." });
     }
@@ -209,6 +234,8 @@ router.post("/", async (req, res) => {
       emergency_contact,
       address,
       doctor_id,
+      status,
+      disorder_id,
       created_At: new Date(), // Default to current date
     });
 
