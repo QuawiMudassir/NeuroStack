@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import PatientTable from "./PatientTable";
 
 
 const DashboardSideNav = () => {
@@ -75,8 +76,7 @@ const DashboardSideNav = () => {
 
       {/* Main Dashboard Area */}
       <div className="w-4/5 p-6 bg-gray-100">
-        <h1 className="text-xl font-bold">Dashboard Content Goes Here</h1>
-        {/* Add your dashboard components inside this div */}
+          <PatientTable />
       </div>
     </div>
   );
