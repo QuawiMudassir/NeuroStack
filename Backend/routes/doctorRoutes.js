@@ -80,7 +80,20 @@ router.post("/", async (req, res) => {
     });
 
     await doctor.save();
-    res.status(201).json(doctor);
+    const token = jwt.sign(
+      { doctorId: doctor._id, email: doctor.email },
+      "your_jwt_secret",
+      { expiresIn: "1h" }
+    );
+    const patients = await Patient.find({
+      doctor_id: doctor.doctor_id,
+    });
+
+    return res.status(201).json({
+      token,
+      message: "Login successful",
+      doctor: {...doctor._doc, patients },
+    });
   } catch (err) {
     res
       .status(500)
@@ -317,12 +330,12 @@ router.post("/login", async (req, res) => {
     );
     const patients = await Patient.find({
       doctor_id: doctor.doctor_id,
-    }).populate("doctor_id");
+    });
 
     return res.json({
       token,
       message: "Login successful",
-      doctor: { doctor: {...doctor._doc, patients }},
+      doctor: {...doctor._doc, patients },
     });
   } catch (error) {
     return res.status(500).json({ message: "Server error" });
