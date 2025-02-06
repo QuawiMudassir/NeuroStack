@@ -35,6 +35,8 @@ const router = express.Router();
  *                 format: email
  *               password:
  *                 type: string
+ *               confirm_password:
+ *                 type: string
  *               contact:
  *                 type: string
  *               specialization:
@@ -56,10 +58,19 @@ router.post("/", async (req, res) => {
       last_name,
       email,
       password,
+      confirm_password,
       contact,
       specialization,
       subscription,
     } = req.body;
+
+    if (!password || !confirm_password) {
+      return res.status(400).json({ message: "Both fields are required!" });
+    }
+
+    if (password !== confirm_password) {
+      return res.status(400).json({ message: "Passwords do not match!" });
+    }
 
     const existingDoctor = await Doctor.findOne({ email });
     if (existingDoctor) {
@@ -88,11 +99,13 @@ router.post("/", async (req, res) => {
     const patients = await Patient.find({
       doctor_id: doctor.doctor_id,
     });
+    const doctorData = { ...doctor._doc, patients };
+    delete doctorData.password;
 
     return res.status(201).json({
       token,
       message: "Login successful",
-      doctor: {...doctor._doc, patients },
+      doctor: doctorData,
     });
   } catch (err) {
     res
@@ -332,10 +345,13 @@ router.post("/login", async (req, res) => {
       doctor_id: doctor.doctor_id,
     });
 
+    const doctorData = { ...doctor._doc, patients };
+    delete doctorData.password;
+
     return res.json({
       token,
       message: "Login successful",
-      doctor: {...doctor._doc, patients },
+      doctor: doctorData,
     });
   } catch (error) {
     return res.status(500).json({ message: "Server error" });
