@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import axios from "axios";
 
 const PatientDashboard = () => {
   const [patients, setPatients] = useState([]);
@@ -9,7 +10,8 @@ const PatientDashboard = () => {
   // Retrieve doctor object from localStorage
   const doctor = JSON.parse(localStorage.getItem("doctor"));
   const doctorId = doctor ? doctor._id : null;
-  const doctorName = doctor ? `${doctor.first_name} ${doctor.last_name}` : "Doctor";
+  const doctorName = doctor ? `${doctor.first_name}  ${doctor.last_name}` : "Doctor";
+  const doc_specialization = doctor ? `${doctor.specialization}` : "Doctor";
 
   useEffect(() => {
     const fetchPatients = async () => {
@@ -49,9 +51,25 @@ const PatientDashboard = () => {
     `${patient.first_name} ${patient.last_name}`.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // Delete patient function
+  const deletePatient = async (id) => {
+    console.log("Deleting patient with ID:", id); // Debugging log
+  
+    try {
+      const response = await axios.delete(`http://localhost:3000/api/patients/${id}`);
+      console.log(response.data.message);
+  
+      // Remove the deleted patient from state
+      setPatients((prevPatients) => prevPatients.filter(patient => patient._id !== id));
+    } catch (error) {
+      console.error("Error deleting patient:", error.response?.data?.error || error.message);
+    }
+  };
+  
   return (
     <div className="p-6 bg-gray-100 min-h-screen">
-      <h2 className="text-2xl font-semibold mb-4">Welcome, Dr.{doctorName}!</h2>
+      <h2 className="text-2xl font-semibold mb-4">Welcome, Dr. {doctorName}</h2>
+      <h3 className="text-1x5 font-semibold mb-3">Specialized in {doc_specialization}</h3>
 
       {/* Search Bar & Add Button */}
       <div className="flex gap-2 mb-4">
@@ -100,9 +118,12 @@ const PatientDashboard = () => {
                     <button className="bg-gray-200 px-3 py-1 rounded-md shadow hover:bg-gray-300 transition">
                       Edit
                     </button>
-                    <button className="bg-red-500 text-white px-3 py-1 rounded-md shadow hover:bg-red-600 transition">
+                   
+                    <button className="bg-red-500 text-white px-3 py-1 rounded-md shadow hover:bg-red-600 transition" onClick={() => deletePatient(patient._id)} >
                       Delete
                     </button>
+
+
                   </td>
                 </tr>
               ))}
