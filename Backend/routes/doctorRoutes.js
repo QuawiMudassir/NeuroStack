@@ -342,7 +342,7 @@ router.post("/login", async (req, res) => {
       { expiresIn: "1h" }
     );
     const patients = await Patient.find({
-      doctor_id: doctor.doctor_id,
+      doctor_id: doctor.id,
     });
 
     const doctorData = { ...doctor._doc, patients };
