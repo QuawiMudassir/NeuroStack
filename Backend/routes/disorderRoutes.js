@@ -198,4 +198,36 @@ router.delete("/:id", async (req, res) => {
   }
 });
 
+// Added New API to fetch the disorder id and it's name for pop-up  form 
+
+/**
+ * @swagger
+ * /api/disorders/brief:
+ *   get:
+ *     summary: Retrieve brief information about all disorders (ID and name only)
+ *     tags: [Disorders]
+ *     responses:
+ *       200:
+ *         description: A list of disorders with ID and name
+ *       500:
+ *         description: Server error
+ */
+router.get("/brief", async (req, res) => {
+  try {
+    // Retrieve only 'disorder_name' and '_id' fields
+    const disorders = await Disorder.find({}, 'disorder_name'); 
+
+    // Map the result to include only the id and disorder_name
+    const briefDisorders = disorders.map(disorder => ({
+      id: disorder._id,   // _id is MongoDB's default identifier
+      disorder_name: disorder.disorder_name
+    }));
+
+    res.status(200).json(briefDisorders);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+
 module.exports = router;
