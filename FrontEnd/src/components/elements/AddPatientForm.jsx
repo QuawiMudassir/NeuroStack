@@ -126,7 +126,7 @@ const AddPatientForm = ({
             onChange={handleInputChange}
           />
 
-          {/* Disorder Select */}
+          {/* Disorder Select
           <select
             name="disorder_id"
             className="border p-3 rounded-lg shadow-md w-full focus:ring-2 focus:ring-[#008170] outline-none"
@@ -139,7 +139,7 @@ const AddPatientForm = ({
                 {disorder.name}
               </option>
             ))}
-          </select>
+          </select> */}
 
           {/* Action Buttons */}
           <div className="flex justify-between items-center mt-6">

@@ -8,6 +8,7 @@ const PatientDashboard = () => {
   const [error, setError] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [showAddForm, setShowAddForm] = useState(false); // For controlling AddPatientForm visibility
+  const [editingPatient, setEditingPatient] = useState(null); // For controlling edit form visibility
   const [newPatient, setNewPatient] = useState({
     first_name: "",
     last_name: "",
@@ -80,6 +81,24 @@ const PatientDashboard = () => {
     }
   };
 
+  // Update the patient data
+  const handleUpdatePatient = async (patientData) => {
+    try {
+      const response = await axios.put(`http://localhost:3000/api/patients/${editingPatient._id}`, patientData);
+      console.log("Patient updated successfully:", response.data);
+
+      // Close the form and refresh patient list
+      setEditingPatient(null);
+      setPatients((prevPatients) =>
+        prevPatients.map((patient) =>
+          patient._id === editingPatient._id ? response.data : patient
+        )
+      );
+    } catch (error) {
+      console.error("Error updating patient:", error.response?.data?.error || error.message);
+    }
+  };
+
   // Filter patients based on search term
   const filteredPatients = patients.filter((patient) =>
     `${patient.first_name} ${patient.last_name}`.toLowerCase().includes(searchTerm.toLowerCase())
@@ -112,21 +131,25 @@ const PatientDashboard = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
         />
         <button
-          onClick={() => setShowAddForm(true)} // Show the AddPatientForm
+          onClick={() => {
+            setShowAddForm(true);
+            setEditingPatient(null); // Clear any editing state
+          }}
           className="bg-[#008170] text-white px-4 py-2 rounded-md shadow hover:bg-[#006b5a] transition"
         >
           Add Patient
         </button>
       </div>
 
-      {/* Add Patient Form */}
+      {/* Add or Edit Patient Form */}
       <AddPatientForm
         show={showAddForm}
         onClose={() => setShowAddForm(false)} // Close the form
-        onSubmit={handleSubmitNewPatient}
+        onSubmit={editingPatient ? handleUpdatePatient : handleSubmitNewPatient} // Adjust for add/edit
         handleInputChange={handleInputChange}
         newPatient={newPatient}
         disorders={[]} // Pass the disorders here (you can fetch them from API if needed)
+        editingPatient={editingPatient} // Pass the editing patient data to the form
       />
 
       {loading ? (
@@ -157,7 +180,14 @@ const PatientDashboard = () => {
                   <td className="p-3">{patient.gender}</td>
                   <td className="p-3">{patient.email}</td>
                   <td className="p-3 flex gap-2">
-                    <button className="bg-gray-200 px-3 py-1 rounded-md shadow hover:bg-gray-300 transition">
+                    <button
+                      className="bg-blue-500 text-white px-3 py-1 rounded-md shadow hover:bg-blue-600 transition"
+                      onClick={() => {
+                        setEditingPatient(patient);
+                        setNewPatient(patient); // Pre-fill the form with current patient data
+                        setShowAddForm(true); // Open the form in edit mode
+                      }}
+                    >
                       Edit
                     </button>
                     <button
