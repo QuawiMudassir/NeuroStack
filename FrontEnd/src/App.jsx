@@ -3,6 +3,7 @@ import Home from './pages/Home';
 import LandingPage from './pages/AssistancePal';
 import LoginPage from "./pages/LoginPage";
 import Dashboard from "./pages/Dashboard";
+import PatientDetails from "./pages/PatientDetails";
 
 const isAuthenticated = !!localStorage.getItem("authToken");
 
@@ -16,9 +17,10 @@ function App() {
         <Route path="/company" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage/>}/>
         <Route
-    path="/dashboard/:doctorId/patients"
-    element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />}
-  />
+              path="/dashboard/:doctorId/patients"
+              element={isAuthenticated ? <Dashboard /> : <Navigate to="/login" />}
+        />
+        <Route path="/patients/:id" element={<PatientDetails />} />
       </Routes>
     </Router>
   );

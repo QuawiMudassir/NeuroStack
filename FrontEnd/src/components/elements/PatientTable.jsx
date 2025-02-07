@@ -121,7 +121,6 @@ const PatientDashboard = () => {
     <div className="p-6 bg-gray-100 min-h-screen">
       <h2 className="text-2xl font-semibold mb-4">Welcome, Dr. {doctorName}</h2>
 
-      {/* Search Bar & Add Button */}
       <div className="flex gap-2 mb-4">
         <input
           type="text"
@@ -173,7 +172,11 @@ const PatientDashboard = () => {
             </thead>
             <tbody>
               {filteredPatients.map((patient) => (
-                <tr key={patient._id} className="border-b">
+                <tr
+                key={patient._id}
+                className="border-b cursor-pointer hover:bg-gray-100"
+                onClick={() => navigate(`/patients/${patient._id}`)} 
+              >
                   <td className="p-3">{patient._id.slice(-4)}</td>
                   <td className="p-3">{patient.first_name} {patient.last_name}</td>
                   <td className="p-3">{new Date(patient.dob).toLocaleDateString()}</td>

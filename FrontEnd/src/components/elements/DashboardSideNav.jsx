@@ -1,9 +1,22 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import PatientTable from "./PatientTable";
 
 
 const DashboardSideNav = () => {
+  const [doctorName, setDoctorName] = useState("Loading...");
+
+  useEffect(() => {
+    const doctorData = localStorage.getItem("doctor"); // Retrieve stored doctor data
+    if (doctorData) {
+      const doctor = JSON.parse(doctorData);
+      const FullName = `${doctor.first_name} ${doctor.last_name}`;
+      setDoctorName(FullName|| "Doctor Name Not Found"); // Set doctor's name
+    } else {
+      setDoctorName("Doctor Name Not Found");
+    }
+  }, []);
+
   return (
     <div className="flex h-screen">
       {/* Sidebar - 20% Width */}
@@ -48,7 +61,7 @@ const DashboardSideNav = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/logout" className="block rounded-lg px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100">
+                <Link to="/login" className="block rounded-lg px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100">
                   Logout
                 </Link>
               </li>
@@ -66,8 +79,8 @@ const DashboardSideNav = () => {
             />
             <div>
               <p className="text-xs">
-                <strong className="block font-medium">Eric Frusciante</strong>
-                <span>eric@frusciante.com</span>
+                <strong className="block font-medium">{doctorName}</strong>
+                <span>Doctor</span>
               </p>
             </div>
           </Link>
